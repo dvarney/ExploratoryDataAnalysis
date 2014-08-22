@@ -8,12 +8,13 @@
 #   task you will need to make a single plot. Unless specified, you can use any plotting system in R to 
 #   make your plot.
 #
-#6. Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle  
+#   6. Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle  
 #   sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over  
 #   time in motor vehicle emissions?
 #
 #   ANSWER:
-#   The large increase was noted for LA County, with a decline for Baltimore.
+#   A large increase was noted for LA County, followed by a decline, but an overal increase. With a 
+#   decline for Baltimore, we are comparing two disparate areas, physically, economically and socially.
 #
 #   COMMENTS:
 #   In viewing the plot6.png image, we see a marked difference between the Los Angeles County (LAC) and 
@@ -29,7 +30,7 @@
 library(ggplot2)
 library(reshape2)
 
-plot5 <- function()
+plot6 <- function()
     {
         #setup all the file pointers
         fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
@@ -59,13 +60,32 @@ plot5 <- function()
         #find the offset from 1999 to 2008
         totalPM25 <- round((obs[2,3]-obs[1,3])+(obs[3,3]-obs[2,3])-(obs[3,3]-obs[4,3]))
         
-        #do a line plot for the two areas
+        #do some column names and the LAC/BC PM offsets
         colnames(obs)<-c("year","fips","emissions")
-        ggplot(obs, aes(x=factor(year), y=emissions,group=fips)) + geom_line(aes(colour=fips)) +
+        LAC <- round(((obs[2,3]-obs[1,3])+(obs[3,3]-obs[2,3])-(obs[3,3]-obs[4,3])))
+        BC  <- round(((obs[5,3]-obs[6,3])+(obs[6,3]-obs[7,3])+(obs[7,3]-obs[8,3])))
+        
+        #numbers and X,Y for data points
+        addText <- data.frame(category=c(round(obs[1,3]), round(obs[2,3]), round(obs[3,3]), round(obs[4,3]),
+                                         round(obs[5,3]), round(obs[6,3]), round(obs[7,3]), round(obs[8,3])), 
+                              ypt=c(3750, 4750, 4500, 4500,
+                                    350, 500, 500, 200), 
+                              xpt=c(1, 2, 3, 4,
+                                    0.65, 2, 3, 4.25))
+        
+        #plot emissions, LA County vs Baltimore, annotate plot and show PM difference
+        ggplot(obs, aes(x=factor(year), y=emissions, group=fips)) + 
+            geom_line(aes(color=fips)) +
             ggtitle(expression(paste(PM[2.5]," Emissions by Vehicle Sources"))) + 
             labs(x = "Years", y=("Emissions")) +
-            scale_color_manual (values=c("red","black"), labels=c("LA County","Baltimore City"))
-        
+            geom_point(aes(x=factor(year), y=emissions), shape=1, size=4) +
+            scale_color_manual (values=c("red","black"), labels=c("LA County","Baltimore City")) +
+            annotate("text", x=addText$xpt, y=addText$ypt, label=addText$category) +
+            geom_text(data=NULL, x=3.5, y=2500,
+                      label=substitute(paste('LAC = +', lac), list(lac=LAC))) +
+            geom_text(data=NULL, x=3.5, y=2250,
+                      label=substitute(paste('BC  = -', bc), list(bc=BC)))
+            
         #save a PNG file of the plot
         dev.copy(png,'plot6.png'); dev.off()
     }

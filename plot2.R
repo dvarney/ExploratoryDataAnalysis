@@ -49,4 +49,4 @@ plot2 <- function()
 
         #make a PNG plot 
         dev.copy(png,'plot2.png'); dev.off()
-}
+    }
