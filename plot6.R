@@ -76,7 +76,7 @@ plot6 <- function()
         #plot emissions, LA County vs Baltimore, annotate plot and show PM difference
         ggplot(obs, aes(x=factor(year), y=emissions, group=fips)) + 
             geom_line(aes(color=fips)) +
-            ggtitle(expression(paste(PM[2.5]," Emissions by Vehicle Sources"))) + 
+            ggtitle(expression(paste(PM[2.5]," Emissions by Motor Vehicle Sources"))) + 
             labs(x = "Years", y=("Emissions")) +
             geom_point(aes(x=factor(year), y=emissions), shape=1, size=4) +
             scale_color_manual (values=c("red","black"), labels=c("LA County","Baltimore City")) +
